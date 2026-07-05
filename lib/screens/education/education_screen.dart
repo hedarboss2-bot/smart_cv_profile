@@ -76,7 +76,7 @@ class EducationScreen extends StatelessWidget {
                     subtitle: controller.educations.isEmpty
                         ? "Add your education to increase this score."
                         : "${controller.educations.length} education item(s) added.",
-                    score: score,
+                    progress: score,
                     icon: Icons.school,
                   ),
 
