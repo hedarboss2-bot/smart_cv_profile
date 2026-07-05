@@ -2,10 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_cv_profile/controllers/education_controller.dart';
-import 'package:smart_cv_profile/models/education_model.dart';
+import 'package:smart_cv_profile/widgets/education_card.dart';
+import 'package:smart_cv_profile/widgets/education_form.dart';
 
 class EducationScreen extends StatelessWidget {
   const EducationScreen({super.key});
+
+  void _openEducationForm(BuildContext context, {education}) {
+    final controller = context.read<EducationController>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return EducationForm(
+          education: education,
+          onSave: (savedEducation) {
+            if (education == null) {
+              controller.addEducation(savedEducation);
+            } else {
+              controller.updateEducation(savedEducation);
+            }
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,22 +38,7 @@ class EducationScreen extends StatelessWidget {
         title: const Text("Education"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.addEducation(
-            const EducationModel(
-              id: '',
-              university: 'Example University',
-              degree: 'Bachelor',
-              fieldOfStudy: 'Computer Science',
-              startDate: '2020',
-              endDate: '2024',
-              isPresent: false,
-              grade: 'A',
-              description: 'Studied software development and Flutter.',
-              certificatePath: '',
-            ),
-          );
-        },
+        onPressed: () => _openEducationForm(context),
         child: const Icon(Icons.add),
       ),
       body: SafeArea(
@@ -44,29 +51,23 @@ class EducationScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 18),
                     ),
                   )
-                : ListView.separated(
+                : ListView.builder(
                     padding: const EdgeInsets.all(20),
                     itemCount: controller.educations.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 14),
                     itemBuilder: (context, index) {
                       final education = controller.educations[index];
 
-                      return Card(
-                        child: ListTile(
-                          leading: const Icon(Icons.school),
-                          title: Text(education.university),
-                          subtitle: Text(
-                            "${education.degree} • ${education.fieldOfStudy}\n${education.startDate} - ${education.isPresent ? 'Present' : education.endDate}",
-                          ),
-                          isThreeLine: true,
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              controller.deleteEducation(education.id);
-                            },
-                          ),
-                        ),
+                      return EducationCard(
+                        education: education,
+                        onEdit: () {
+                          _openEducationForm(
+                            context,
+                            education: education,
+                          );
+                        },
+                        onDelete: () {
+                          controller.deleteEducation(education.id);
+                        },
                       );
                     },
                   ),

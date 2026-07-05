@@ -9,16 +9,16 @@ class DashboardGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _DashboardItem('Profile', Icons.person, AppRoutes.personalInfo),
-      _DashboardItem('Education', Icons.school, AppRoutes.education),
-      _DashboardItem('Experience', Icons.work, AppRoutes.experience),
-      _DashboardItem('Skills', Icons.psychology, AppRoutes.skills),
-      _DashboardItem('Gaming', Icons.sports_esports, AppRoutes.gaming),
-      _DashboardItem('Devices', Icons.computer, AppRoutes.devices),
-      _DashboardItem('Social Links', Icons.share, AppRoutes.social),
-      _DashboardItem('CV Preview', Icons.description, AppRoutes.cvPreview),
-      _DashboardItem('Export PDF', Icons.picture_as_pdf, AppRoutes.exportPdf),
-      _DashboardItem('Settings', Icons.settings, AppRoutes.settings),
+      _DashboardItem('Profile', Icons.person, AppRoutes.personalInfo, true),
+      _DashboardItem('Education', Icons.school, AppRoutes.education, true),
+      _DashboardItem('Experience', Icons.work, AppRoutes.experience, true),
+      _DashboardItem('Skills', Icons.psychology, AppRoutes.skills, false),
+      _DashboardItem('Gaming', Icons.sports_esports, AppRoutes.gaming, false),
+      _DashboardItem('Devices', Icons.computer, AppRoutes.devices, false),
+      _DashboardItem('Social Links', Icons.share, AppRoutes.social, false),
+      _DashboardItem('CV Preview', Icons.description, AppRoutes.cvPreview, false),
+      _DashboardItem('Export PDF', Icons.picture_as_pdf, AppRoutes.exportPdf, false),
+      _DashboardItem('Settings', Icons.settings, AppRoutes.settings, false),
     ];
 
     return GridView.builder(
@@ -37,7 +37,7 @@ class DashboardGrid extends StatelessWidget {
           title: item.title,
           icon: item.icon,
           onTap: () {
-            if (item.route == AppRoutes.personalInfo) {
+            if (item.isReady) {
               Navigator.pushNamed(context, item.route);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -57,6 +57,12 @@ class _DashboardItem {
   final String title;
   final IconData icon;
   final String route;
+  final bool isReady;
 
-  const _DashboardItem(this.title, this.icon, this.route);
+  const _DashboardItem(
+    this.title,
+    this.icon,
+    this.route,
+    this.isReady,
+  );
 }
