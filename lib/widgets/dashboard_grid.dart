@@ -12,7 +12,7 @@ class DashboardGrid extends StatelessWidget {
       _DashboardItem('Profile', Icons.person, AppRoutes.personalInfo, true),
       _DashboardItem('Education', Icons.school, AppRoutes.education, true),
       _DashboardItem('Experience', Icons.work, AppRoutes.experience, true),
-      _DashboardItem('Skills', Icons.psychology, AppRoutes.skills, false),
+      _DashboardItem('Skills', Icons.psychology, AppRoutes.skills, true),
       _DashboardItem('Gaming', Icons.sports_esports, AppRoutes.gaming, false),
       _DashboardItem('Devices', Icons.computer, AppRoutes.devices, false),
       _DashboardItem('Social Links', Icons.share, AppRoutes.social, false),

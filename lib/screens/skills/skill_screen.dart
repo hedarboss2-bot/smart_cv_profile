@@ -3,12 +3,97 @@ import 'package:provider/provider.dart';
 
 import 'package:smart_cv_profile/controllers/skill_controller.dart';
 import 'package:smart_cv_profile/core/rules/skill_rules.dart';
-import 'package:smart_cv_profile/widgets/module_score_card.dart';
 import 'package:smart_cv_profile/widgets/skill_card.dart';
 import 'package:smart_cv_profile/widgets/skill_form.dart';
+import 'package:smart_cv_profile/widgets/smart_journey_card.dart';
 
 class SkillScreen extends StatelessWidget {
   const SkillScreen({super.key});
+
+  String _getLevel(double progress) {
+    final percent = (progress * 100).toInt();
+
+    if (percent >= 81) return "Expert ⭐⭐⭐⭐⭐";
+    if (percent >= 61) return "Advanced ⭐⭐⭐⭐☆";
+    if (percent >= 41) return "Intermediate ⭐⭐⭐☆☆";
+    if (percent >= 21) return "Elementary ⭐⭐☆☆☆";
+    return "Beginner ⭐☆☆☆☆";
+  }
+
+  List<String> _getInsights(SkillController controller) {
+    if (controller.skills.isEmpty) {
+      return [
+        "No skills added yet",
+        "Add your first skill to start your journey",
+      ];
+    }
+
+    final hasCategory = controller.skills.any(
+      (skill) => skill.category.isNotEmpty,
+    );
+
+    final hasHighLevel = controller.skills.any(
+      (skill) => skill.level >= 80,
+    );
+
+    return [
+      "${controller.skills.length} skill(s) added",
+      hasCategory ? "Skill categories added" : "Skill categories missing",
+      hasHighLevel ? "Expert-level skill added" : "Add a skill above 80%",
+    ];
+  }
+
+  String _getNextGoal(SkillController controller) {
+    if (controller.skills.isEmpty) {
+      return "Add your first skill";
+    }
+
+    final hasCategory = controller.skills.any(
+      (skill) => skill.category.isNotEmpty,
+    );
+
+    final hasHighLevel = controller.skills.any(
+      (skill) => skill.level >= 80,
+    );
+
+    if (!hasCategory) return "Add skill categories";
+    if (!hasHighLevel) return "Add one skill with 80% or higher";
+    if (controller.skills.length < 5) return "Add more skills";
+
+    return "Your skills journey looks strong";
+  }
+
+  String _getAchievement(double progress) {
+    final percent = (progress * 100).toInt();
+
+    if (percent >= 81) return "Skill Master";
+    if (percent >= 61) return "Advanced Builder";
+    if (percent >= 41) return "Skill Explorer";
+    if (percent >= 21) return "Skill Starter";
+    return "Start Your Skills Journey";
+  }
+
+  String _getCoachMessage(double progress) {
+    final percent = (progress * 100).toInt();
+
+    if (percent >= 81) {
+      return "Excellent! Your skills section looks strong and professional.";
+    }
+
+    if (percent >= 61) {
+      return "Great progress! Add more high-level skills to reach Expert level.";
+    }
+
+    if (percent >= 41) {
+      return "You are building a strong skill profile. Add categories and improve skill levels.";
+    }
+
+    if (percent >= 21) {
+      return "Good start. Add more skills to make this section stronger.";
+    }
+
+    return "Start by adding your first skill. This helps Smart CV understand what you can do.";
+  }
 
   void _openSkillForm(BuildContext context, {skill}) {
     final controller = context.read<SkillController>();
@@ -34,10 +119,7 @@ class SkillScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<SkillController>();
-
-    final progress = SkillRules.calculateScore(
-      controller.skills,
-    );
+    final progress = SkillRules.calculateScore(controller.skills);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,19 +130,20 @@ class SkillScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: controller.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                ModuleScoreCard(
-                  title: "Skills Score",
-                  subtitle: controller.skills.isEmpty
-                      ? "Add your skills to improve your score."
-                      : "${controller.skills.length} skill(s) added",
+                SmartJourneyCard(
+                  title: "Skills",
+                  level: _getLevel(progress),
                   progress: progress,
                   icon: Icons.psychology,
+                  insights: _getInsights(controller),
+                  nextGoal: _getNextGoal(controller),
+                  achievement: _getAchievement(progress),
+                  coachMessage: _getCoachMessage(progress),
+                  reward: "+10 XP",
                 ),
 
                 const SizedBox(height: 20),
