@@ -1,119 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smart_cv_profile/controllers/education_controller.dart';
-import 'package:smart_cv_profile/core/rules/education_rules.dart';
-import 'package:smart_cv_profile/widgets/education_card.dart';
-import 'package:smart_cv_profile/widgets/education_form.dart';
+import 'package:smart_cv_profile/controllers/experience_controller.dart';
+import 'package:smart_cv_profile/core/journey/journey_engine.dart';
+import 'package:smart_cv_profile/core/journey/journey_module.dart';
+import 'package:smart_cv_profile/core/rules/experience_rules.dart';
+import 'package:smart_cv_profile/widgets/experience_card.dart';
+import 'package:smart_cv_profile/widgets/experience_form.dart';
 import 'package:smart_cv_profile/widgets/smart_journey_card.dart';
 
-class EducationScreen extends StatelessWidget {
-  const EducationScreen({super.key});
+class ExperienceScreen extends StatelessWidget {
+  const ExperienceScreen({super.key});
 
-  String _getLevel(double progress) {
-    final percent = (progress * 100).toInt();
-
-    if (percent >= 81) return "Expert ⭐⭐⭐⭐⭐";
-    if (percent >= 61) return "Advanced ⭐⭐⭐⭐☆";
-    if (percent >= 41) return "Intermediate ⭐⭐⭐☆☆";
-    if (percent >= 21) return "Elementary ⭐⭐☆☆☆";
-    return "Beginner ⭐☆☆☆☆";
-  }
-
-  List<String> _getInsights(EducationController controller) {
-    if (controller.educations.isEmpty) {
+  List<String> _getInsights(ExperienceController controller) {
+    if (controller.experiences.isEmpty) {
       return [
-        "No education records yet",
-        "Add your first education record",
+        "No work experience yet",
+        "Add your first job to start your career journey",
       ];
     }
 
-    final hasGrade = controller.educations.any(
-      (education) => education.grade.isNotEmpty,
+    final hasDescription = controller.experiences.any(
+      (experience) => experience.description.isNotEmpty,
     );
 
-    final hasDescription = controller.educations.any(
-      (education) => education.description.isNotEmpty,
+    final hasLocation = controller.experiences.any(
+      (experience) => experience.location.isNotEmpty,
+    );
+
+    final hasEmploymentType = controller.experiences.any(
+      (experience) => experience.employmentType.isNotEmpty,
     );
 
     return [
-      "${controller.educations.length} education record(s)",
-      hasGrade ? "Grade / GPA added" : "Grade / GPA missing",
-      hasDescription
-          ? "Description added"
-          : "Description missing",
+      "${controller.experiences.length} experience record(s) added",
+      hasDescription ? "Job description added" : "Job description missing",
+      hasLocation ? "Work location added" : "Work location missing",
+      hasEmploymentType ? "Employment type added" : "Employment type missing",
     ];
   }
 
-  String _getNextGoal(EducationController controller) {
-    if (controller.educations.isEmpty) {
-      return "Add your first education record";
+  String _getNextGoal(ExperienceController controller) {
+    if (controller.experiences.isEmpty) {
+      return "Add your first work experience";
     }
 
-    final hasGrade = controller.educations.any(
-      (education) => education.grade.isNotEmpty,
+    final hasDescription = controller.experiences.any(
+      (experience) => experience.description.isNotEmpty,
     );
 
-    final hasDescription = controller.educations.any(
-      (education) => education.description.isNotEmpty,
+    final hasLocation = controller.experiences.any(
+      (experience) => experience.location.isNotEmpty,
     );
 
-    if (!hasGrade) return "Add Grade / GPA";
-    if (!hasDescription) return "Add Description";
-    if (controller.educations.length < 2) {
-      return "Add another education";
-    }
+    final hasEmploymentType = controller.experiences.any(
+      (experience) => experience.employmentType.isNotEmpty,
+    );
 
-    return "Your education profile looks great!";
-  }
+    if (!hasDescription) return "Add job description";
+    if (!hasLocation) return "Add work location";
+    if (!hasEmploymentType) return "Add employment type";
+    if (controller.experiences.length < 2) return "Add another experience";
 
-  String _getAchievement(double progress) {
-    final percent = (progress * 100).toInt();
-
-    if (percent >= 81) return "Education Expert";
-    if (percent >= 61) return "Education Explorer";
-    if (percent >= 41) return "Academic Builder";
-    if (percent >= 21) return "Academic Starter";
-
-    return "Start Your Journey";
+    return "Your career journey looks strong";
   }
 
   String _getCoachMessage(double progress) {
     final percent = (progress * 100).toInt();
 
     if (percent >= 81) {
-      return "Excellent work! Your education profile looks professional.";
+      return "Excellent work! Your experience section looks strong and professional.";
     }
 
     if (percent >= 61) {
-      return "Great progress! Add the remaining details to reach Expert level.";
+      return "Great progress! Add any missing details to reach Expert level.";
     }
 
     if (percent >= 41) {
-      return "Good progress. Add GPA and descriptions to strengthen your profile.";
+      return "You are building a good career profile. Add descriptions and work details to make it stronger.";
     }
 
     if (percent >= 21) {
-      return "Good start. Continue adding education details.";
+      return "Good start. Add more details about your work experience to improve this section.";
     }
 
-    return "Start by adding your first education record.";
+    return "Start by adding your first work experience. This helps Smart CV understand your professional background.";
   }
 
-  void _openEducationForm(BuildContext context, {education}) {
-    final controller = context.read<EducationController>();
+  void _openExperienceForm(BuildContext context, {experience}) {
+    final controller = context.read<ExperienceController>();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) {
-        return EducationForm(
-          education: education,
-          onSave: (savedEducation) {
-            if (education == null) {
-              controller.addEducation(savedEducation);
+        return ExperienceForm(
+          experience: experience,
+          onSave: (savedExperience) {
+            if (experience == null) {
+              controller.addExperience(savedExperience);
             } else {
-              controller.updateEducation(savedEducation);
+              controller.updateExperience(savedExperience);
             }
           },
         );
@@ -123,63 +110,59 @@ class EducationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<EducationController>();
-    final progress = EducationRules.calculateScore(
-      controller.educations,
-    );
+    final controller = context.watch<ExperienceController>();
+    final progress = ExperienceRules.calculateScore(controller.experiences);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Education"),
+        title: const Text("Experience"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _openEducationForm(context),
+        onPressed: () => _openExperienceForm(context),
         child: const Icon(Icons.add),
       ),
       body: controller.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
                 SmartJourneyCard(
-                  title: "Education",
-                  level: _getLevel(progress),
+                  title: "Experience",
+                  level: JourneyEngine.getLevel(progress),
                   progress: progress,
-                  icon: Icons.school,
+                  icon: Icons.work,
                   insights: _getInsights(controller),
                   nextGoal: _getNextGoal(controller),
-                  achievement: _getAchievement(progress),
+                  achievement: JourneyEngine.getAchievement(
+                    module: JourneyModule.experience,
+                    progress: progress,
+                  ),
                   coachMessage: _getCoachMessage(progress),
+                  reward: JourneyEngine.getReward(progress),
                 ),
-
                 const SizedBox(height: 20),
-
-                if (controller.educations.isEmpty)
+                if (controller.experiences.isEmpty)
                   const Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: 40),
                       child: Text(
-                        "No education added yet.",
+                        "No experience added yet.",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
                   )
                 else
-                  ...controller.educations.map(
-                    (education) => EducationCard(
-                      education: education,
+                  ...controller.experiences.map(
+                    (experience) => ExperienceCard(
+                      experience: experience,
                       onEdit: () {
-                        _openEducationForm(
+                        _openExperienceForm(
                           context,
-                          education: education,
+                          experience: experience,
                         );
                       },
                       onDelete: () {
-                        controller.deleteEducation(
-                          education.id,
-                        );
+                        controller.deleteExperience(experience.id);
                       },
                     ),
                   ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_cv_profile/controllers/skill_controller.dart';
+import 'package:smart_cv_profile/core/journey/journey_engine.dart';
+import 'package:smart_cv_profile/core/journey/journey_module.dart';
 import 'package:smart_cv_profile/core/rules/skill_rules.dart';
 import 'package:smart_cv_profile/widgets/skill_card.dart';
 import 'package:smart_cv_profile/widgets/skill_form.dart';
@@ -9,16 +11,6 @@ import 'package:smart_cv_profile/widgets/smart_journey_card.dart';
 
 class SkillScreen extends StatelessWidget {
   const SkillScreen({super.key});
-
-  String _getLevel(double progress) {
-    final percent = (progress * 100).toInt();
-
-    if (percent >= 81) return "Expert ⭐⭐⭐⭐⭐";
-    if (percent >= 61) return "Advanced ⭐⭐⭐⭐☆";
-    if (percent >= 41) return "Intermediate ⭐⭐⭐☆☆";
-    if (percent >= 21) return "Elementary ⭐⭐☆☆☆";
-    return "Beginner ⭐☆☆☆☆";
-  }
 
   List<String> _getInsights(SkillController controller) {
     if (controller.skills.isEmpty) {
@@ -61,16 +53,6 @@ class SkillScreen extends StatelessWidget {
     if (controller.skills.length < 5) return "Add more skills";
 
     return "Your skills journey looks strong";
-  }
-
-  String _getAchievement(double progress) {
-    final percent = (progress * 100).toInt();
-
-    if (percent >= 81) return "Skill Master";
-    if (percent >= 61) return "Advanced Builder";
-    if (percent >= 41) return "Skill Explorer";
-    if (percent >= 21) return "Skill Starter";
-    return "Start Your Skills Journey";
   }
 
   String _getCoachMessage(double progress) {
@@ -136,18 +118,19 @@ class SkillScreen extends StatelessWidget {
               children: [
                 SmartJourneyCard(
                   title: "Skills",
-                  level: _getLevel(progress),
+                  level: JourneyEngine.getLevel(progress),
                   progress: progress,
                   icon: Icons.psychology,
                   insights: _getInsights(controller),
                   nextGoal: _getNextGoal(controller),
-                  achievement: _getAchievement(progress),
+                  achievement: JourneyEngine.getAchievement(
+                    module: JourneyModule.skills,
+                    progress: progress,
+                  ),
                   coachMessage: _getCoachMessage(progress),
-                  reward: "+10 XP",
+                  reward: JourneyEngine.getReward(progress),
                 ),
-
                 const SizedBox(height: 20),
-
                 if (controller.skills.isEmpty)
                   const Center(
                     child: Padding(
