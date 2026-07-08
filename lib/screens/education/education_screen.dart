@@ -5,6 +5,10 @@ import 'package:smart_cv_profile/controllers/education_controller.dart';
 import 'package:smart_cv_profile/core/journey/journey_engine.dart';
 import 'package:smart_cv_profile/core/journey/journey_module.dart';
 import 'package:smart_cv_profile/core/rules/education_rules.dart';
+
+import 'package:smart_cv_profile/widgets/common/app_page.dart';
+import 'package:smart_cv_profile/widgets/common/app_scaffold.dart';
+
 import 'package:smart_cv_profile/widgets/education_card.dart';
 import 'package:smart_cv_profile/widgets/education_form.dart';
 import 'package:smart_cv_profile/widgets/smart_journey_card.dart';
@@ -21,17 +25,19 @@ class EducationScreen extends StatelessWidget {
     }
 
     final hasGrade = controller.educations.any(
-      (education) => education.grade.isNotEmpty,
+      (e) => e.grade.isNotEmpty,
     );
 
     final hasDescription = controller.educations.any(
-      (education) => education.description.isNotEmpty,
+      (e) => e.description.isNotEmpty,
     );
 
     return [
       "${controller.educations.length} education record(s)",
       hasGrade ? "Grade / GPA added" : "Grade / GPA missing",
-      hasDescription ? "Description added" : "Description missing",
+      hasDescription
+          ? "Description added"
+          : "Description missing",
     ];
   }
 
@@ -41,16 +47,18 @@ class EducationScreen extends StatelessWidget {
     }
 
     final hasGrade = controller.educations.any(
-      (education) => education.grade.isNotEmpty,
+      (e) => e.grade.isNotEmpty,
     );
 
     final hasDescription = controller.educations.any(
-      (education) => education.description.isNotEmpty,
+      (e) => e.description.isNotEmpty,
     );
 
     if (!hasGrade) return "Add Grade / GPA";
     if (!hasDescription) return "Add Description";
-    if (controller.educations.length < 2) return "Add another education";
+    if (controller.educations.length < 2) {
+      return "Add another education";
+    }
 
     return "Your education profile looks great!";
   }
@@ -101,63 +109,73 @@ class EducationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<EducationController>();
-    final progress = EducationRules.calculateScore(controller.educations);
+    final progress = EducationRules.calculateScore(
+      controller.educations,
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Education"),
-      ),
+    return AppScaffold(
+      title: "Education",
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openEducationForm(context),
         child: const Icon(Icons.add),
       ),
-      body: controller.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                SmartJourneyCard(
-                  title: "Education",
-                  level: JourneyEngine.getLevel(progress),
-                  progress: progress,
-                  icon: Icons.school,
-                  insights: _getInsights(controller),
-                  nextGoal: _getNextGoal(controller),
-                  achievement: JourneyEngine.getAchievement(
-                    module: JourneyModule.education,
+      body: AppPage(
+        child: controller.isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView(
+                children: [
+                  SmartJourneyCard(
+                    title: "Education",
+                    level: JourneyEngine.getLevel(progress),
                     progress: progress,
+                    icon: Icons.school,
+                    insights: _getInsights(controller),
+                    nextGoal: _getNextGoal(controller),
+                    achievement: JourneyEngine.getAchievement(
+                      module: JourneyModule.education,
+                      progress: progress,
+                    ),
+                    coachMessage: _getCoachMessage(progress),
+                    reward: JourneyEngine.getReward(progress),
                   ),
-                  coachMessage: _getCoachMessage(progress),
-                  reward: JourneyEngine.getReward(progress),
-                ),
-                const SizedBox(height: 20),
-                if (controller.educations.isEmpty)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 40),
-                      child: Text(
-                        "No education added yet.",
-                        style: TextStyle(fontSize: 18),
+
+                  const SizedBox(height: 20),
+
+                  if (controller.educations.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Text(
+                          "No education added yet.",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    )
+                  else
+                    ...controller.educations.map(
+                      (education) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: EducationCard(
+                          education: education,
+                          onEdit: () {
+                            _openEducationForm(
+                              context,
+                              education: education,
+                            );
+                          },
+                          onDelete: () {
+                            controller.deleteEducation(
+                              education.id,
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  )
-                else
-                  ...controller.educations.map(
-                    (education) => EducationCard(
-                      education: education,
-                      onEdit: () {
-                        _openEducationForm(
-                          context,
-                          education: education,
-                        );
-                      },
-                      onDelete: () {
-                        controller.deleteEducation(education.id);
-                      },
-                    ),
-                  ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 }

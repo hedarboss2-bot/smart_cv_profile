@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:smart_cv_profile/core/design/app_gradients.dart';
+import 'package:smart_cv_profile/core/design/app_radius.dart';
+import 'package:smart_cv_profile/core/design/app_shadows.dart';
+import 'package:smart_cv_profile/core/design/app_spacing.dart';
 import 'package:smart_cv_profile/widgets/journey/journey_achievement.dart';
 import 'package:smart_cv_profile/widgets/journey/journey_coach.dart';
 import 'package:smart_cv_profile/widgets/journey/journey_goal.dart';
@@ -35,24 +39,11 @@ class SmartJourneyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: AppSpacing.card,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xff111827),
-            Color(0xff1E3A8A),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        borderRadius: AppRadius.xl,
+        gradient: AppGradients.premium,
+        boxShadow: AppShadows.medium,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,22 +54,22 @@ class SmartJourneyCard extends StatelessWidget {
             progress: progress,
             icon: icon,
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: AppSpacing.xxl),
 
           JourneyProgress(progress: progress),
-          const SizedBox(height: 22),
+          const SizedBox(height: AppSpacing.xxl),
 
           JourneyCoach(message: coachMessage),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSpacing.lg),
 
           JourneyInsights(insights: insights),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
 
           JourneyGoal(
             goal: nextGoal,
             reward: reward,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.md),
 
           JourneyAchievement(title: achievement),
         ],
