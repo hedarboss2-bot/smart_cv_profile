@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:smart_cv_profile/app/routes.dart';
-import 'package:smart_cv_profile/core/design/app_colors.dart';
+
 import 'package:smart_cv_profile/core/design/app_radius.dart';
 import 'package:smart_cv_profile/core/design/app_spacing.dart';
 import 'package:smart_cv_profile/core/journey/journey_module.dart';

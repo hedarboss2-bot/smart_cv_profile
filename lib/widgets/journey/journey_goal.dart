@@ -16,10 +16,10 @@ class JourneyGoal extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.12),
+        color: Colors.white.withValues(alpha: .12),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.white.withOpacity(.10),
+          color: Colors.white.withValues(alpha: .10),
         ),
       ),
       child: Row(

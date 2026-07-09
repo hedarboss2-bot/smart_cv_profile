@@ -37,7 +37,7 @@ class ContinueJourneyCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: AppColors.primary.withOpacity(.15),
+                backgroundColor:AppColors.primary.withValues(alpha: .15),
                 child: Icon(
                   icon,
                   color: AppColors.primary,

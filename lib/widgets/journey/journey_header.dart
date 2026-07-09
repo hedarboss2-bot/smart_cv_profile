@@ -22,7 +22,7 @@ class JourneyHeader extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 30,
-          backgroundColor: Colors.white.withOpacity(0.15),
+          backgroundColor: Colors.white.withValues(alpha: .15),
           child: Icon(
             icon,
             size: 30,

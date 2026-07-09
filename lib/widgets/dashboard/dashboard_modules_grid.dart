@@ -115,7 +115,7 @@ class DashboardModulesGrid extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundColor: module.color.withOpacity(.15),
+                        backgroundColor:module.color.withValues(alpha: .15),
                         child: Icon(
                           module.icon,
                           color: module.color,

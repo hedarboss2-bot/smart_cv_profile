@@ -98,7 +98,7 @@ class SmartIdCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white..withValues(alpha: .12),
               borderRadius: BorderRadius.circular(18),
             ),
             child: const Row(
