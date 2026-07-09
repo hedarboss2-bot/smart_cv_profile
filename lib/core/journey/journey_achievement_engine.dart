@@ -1,50 +1,60 @@
-import 'journey_module.dart';
+import 'package:flutter/material.dart';
+
+import 'package:smart_cv_profile/models/journey_achievement_model.dart';
 
 class JourneyAchievementEngine {
   JourneyAchievementEngine._();
 
-  static String getAchievement({
-    required JourneyModule module,
-    required double progress,
+  static List<JourneyAchievementModel> getAchievements({
+    required bool hasProfile,
+    required int educationCount,
+    required int experienceCount,
+    required int skillsCount,
   }) {
-    final percent = (progress * 100).toInt();
-
-    switch (module) {
-      case JourneyModule.education:
-        if (percent >= 81) return "Education Expert";
-        if (percent >= 61) return "Education Explorer";
-        if (percent >= 41) return "Academic Builder";
-        if (percent >= 21) return "Academic Starter";
-        return "Start Your Education Journey";
-
-      case JourneyModule.experience:
-        if (percent >= 81) return "Career Expert";
-        if (percent >= 61) return "Professional Builder";
-        if (percent >= 41) return "Career Explorer";
-        if (percent >= 21) return "Career Starter";
-        return "Start Your Career Journey";
-
-      case JourneyModule.skills:
-        if (percent >= 81) return "Skill Master";
-        if (percent >= 61) return "Advanced Builder";
-        if (percent >= 41) return "Skill Explorer";
-        if (percent >= 21) return "Skill Starter";
-        return "Start Your Skills Journey";
-
-      case JourneyModule.gaming:
-        return "Gaming Journey";
-
-      case JourneyModule.devices:
-        return "Device Collector";
-
-      case JourneyModule.social:
-        return "Social Explorer";
-
-      case JourneyModule.profile:
-        return "Profile Builder";
-
-      case JourneyModule.smartId:
-        return "Smart Identity";
-    }
+    return [
+      JourneyAchievementModel(
+        id: "profile_started",
+        title: "Identity Started",
+        description: "Complete your basic profile information.",
+        icon: Icons.person,
+        xpReward: 20,
+        unlocked: hasProfile,
+      ),
+      JourneyAchievementModel(
+        id: "first_education",
+        title: "First Education",
+        description: "Add your first education record.",
+        icon: Icons.school,
+        xpReward: 25,
+        unlocked: educationCount >= 1,
+      ),
+      JourneyAchievementModel(
+        id: "career_starter",
+        title: "Career Starter",
+        description: "Add your first work experience.",
+        icon: Icons.work,
+        xpReward: 30,
+        unlocked: experienceCount >= 1,
+      ),
+      JourneyAchievementModel(
+        id: "first_skill",
+        title: "First Skill",
+        description: "Add your first skill.",
+        icon: Icons.psychology,
+        xpReward: 10,
+        unlocked: skillsCount >= 1,
+      ),
+      JourneyAchievementModel(
+        id: "core_builder",
+        title: "Core Builder",
+        description: "Add profile, education, experience, and skills.",
+        icon: Icons.emoji_events,
+        xpReward: 50,
+        unlocked: hasProfile &&
+            educationCount >= 1 &&
+            experienceCount >= 1 &&
+            skillsCount >= 1,
+      ),
+    ];
   }
 }

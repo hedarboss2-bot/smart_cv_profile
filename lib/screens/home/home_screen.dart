@@ -1,114 +1,133 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smart_cv_profile/controllers/profile_controller.dart';
 import 'package:smart_cv_profile/controllers/education_controller.dart';
+import 'package:smart_cv_profile/controllers/experience_controller.dart';
+import 'package:smart_cv_profile/controllers/profile_controller.dart';
+import 'package:smart_cv_profile/controllers/skill_controller.dart';
 
-import 'package:smart_cv_profile/models/achievement_model.dart';
+import 'package:smart_cv_profile/core/journey/journey_achievement_engine.dart';
+import 'package:smart_cv_profile/core/journey/journey_recommendation_engine.dart';
+import 'package:smart_cv_profile/core/journey/journey_xp_engine.dart';
+import 'package:smart_cv_profile/core/rules/education_rules.dart';
+import 'package:smart_cv_profile/core/rules/experience_rules.dart';
+import 'package:smart_cv_profile/core/rules/skill_rules.dart';
 
-import 'package:smart_cv_profile/widgets/dashboard_grid.dart';
-import 'package:smart_cv_profile/widgets/dashboard_header.dart';
-import 'package:smart_cv_profile/widgets/profile_completion_card.dart';
-import 'package:smart_cv_profile/widgets/weekly_progress_card.dart';
-import 'package:smart_cv_profile/widgets/quick_actions.dart';
-import 'package:smart_cv_profile/widgets/section_title.dart';
-import 'package:smart_cv_profile/widgets/smart_id_card.dart';
-import 'package:smart_cv_profile/widgets/statistics_card.dart';
-import 'package:smart_cv_profile/widgets/achievements_section.dart';
+import 'package:smart_cv_profile/widgets/common/app_page.dart';
+import 'package:smart_cv_profile/widgets/common/app_scaffold.dart';
+
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_achievements_card.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_continue_journey.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_header.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_progress_overview.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_quick_actions.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_recent_activity.dart';
+import 'package:smart_cv_profile/widgets/dashboard/dashboard_xp_card.dart';
+import 'package:smart_cv_profile/widgets/dashboard/journey_recommendation_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-
-    if (hour < 12) return "Good Morning 👋";
-    if (hour < 18) return "Good Afternoon 👋";
-    return "Good Evening 👋";
-  }
 
   @override
   Widget build(BuildContext context) {
     final profileController = context.watch<ProfileController>();
     final educationController = context.watch<EducationController>();
+    final experienceController = context.watch<ExperienceController>();
+    final skillController = context.watch<SkillController>();
 
     final user = profileController.user;
 
-    return Scaffold(
-      body: SafeArea(
+    final educationProgress = EducationRules.calculateScore(
+      educationController.educations,
+    );
+
+    final experienceProgress = ExperienceRules.calculateScore(
+      experienceController.experiences,
+    );
+
+    final skillsProgress = SkillRules.calculateScore(
+      skillController.skills,
+    );
+
+    final xp = JourneyXPEngine.calculate(
+      hasProfile: user.fullName.isNotEmpty,
+      educationCount: educationController.educations.length,
+      experienceCount: experienceController.experiences.length,
+      skillsCount: skillController.skills.length,
+    );
+
+    final achievements = JourneyAchievementEngine.getAchievements(
+      hasProfile: user.fullName.isNotEmpty,
+      educationCount: educationController.educations.length,
+      experienceCount: experienceController.experiences.length,
+      skillsCount: skillController.skills.length,
+    );
+
+    final recommendation =
+        JourneyRecommendationEngine.getBestRecommendation(
+      educationProgress: educationProgress,
+      experienceProgress: experienceProgress,
+      skillsProgress: skillsProgress,
+    );
+
+    return AppScaffold(
+      title: "Smart CV",
+      showAppBar: false,
+      body: AppPage(
         child: profileController.isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashboardHeader(
-                      greeting: _getGreeting(),
-                      userName: user.fullName,
-                      imagePath: user.imagePath,
+                      name: user.fullName,
                     ),
-                    const SizedBox(height: 20),
 
-                    ProfileCompletionCard(
-                      progress: profileController.identityScore,
-                      level: profileController.identityLevel,
-                      message: profileController.nextLevelMessage,
-                    ),
                     const SizedBox(height: 24),
 
-                    WeeklyProgressCard(
-                      progress: profileController.identityScore,
+                    DashboardXPCard(
+                      xp: xp,
                     ),
+
                     const SizedBox(height: 24),
 
-                    SmartIdCard(user: user),
-                    const SizedBox(height: 24),
-
-                    const QuickActions(),
-                    const SizedBox(height: 24),
-
-                    StatisticsCard(
-                      profile: profileController.identityPercent,
-                      education: educationController.educations.length,
-                      gaming: 0,
-                      devices: 0,
+                    DashboardAchievementsCard(
+                      achievements: achievements,
                     ),
+
+                    const SizedBox(height: 24),
+
+                    DashboardProgressOverview(
+                      educationProgress: educationProgress,
+                      experienceProgress: experienceProgress,
+                      skillsProgress: skillsProgress,
+                    ),
+
                     const SizedBox(height: 28),
 
-                    AchievementsSection(
-                      achievements: [
-                        AchievementModel(
-                          title: "Profile Completed",
-                          description: "Completed your personal profile.",
-                          unlocked: profileController.identityPercent >= 80,
-                        ),
-                        AchievementModel(
-                          title: "First Education",
-                          description: "Added your first education.",
-                          unlocked: educationController.educations.isNotEmpty,
-                        ),
-                        const AchievementModel(
-                          title: "Gaming Profile",
-                          description: "Add your gaming accounts.",
-                          unlocked: false,
-                        ),
-                        const AchievementModel(
-                          title: "Export PDF",
-                          description: "Generate your first CV.",
-                          unlocked: false,
-                        ),
-                      ],
+                    JourneyRecommendationCard(
+                      recommendation: recommendation,
                     ),
+
                     const SizedBox(height: 28),
 
-                    const SectionTitle(
-                      title: "My Dashboard",
-                      subtitle: "Manage your digital identity",
+                    DashboardContinueJourney(
+                      educationProgress: educationProgress,
+                      experienceProgress: experienceProgress,
+                      skillsProgress: skillsProgress,
                     ),
-                    const SizedBox(height: 18),
 
-                    const DashboardGrid(),
+                    const SizedBox(height: 28),
+
+                    const DashboardRecentActivity(),
+
+                    const SizedBox(height: 28),
+
+                    const DashboardQuickActions(),
+
                     const SizedBox(height: 30),
                   ],
                 ),

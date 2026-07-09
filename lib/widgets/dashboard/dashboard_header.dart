@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:smart_cv_profile/core/design/app_colors.dart';
+
 class DashboardHeader extends StatelessWidget {
   final String name;
 
@@ -26,26 +28,39 @@ class DashboardHeader extends StatelessWidget {
             children: [
               Text(
                 _greeting(),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
-                name.isEmpty ? "Welcome!" : "Hi, $name 👋",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                name.isEmpty ? "Welcome 👋" : "Hi, $name 👋",
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 6),
-              Text(
+              const Text(
                 "Keep building your professional identity.",
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
         ),
-        CircleAvatar(
+        const CircleAvatar(
           radius: 28,
-          child: const Icon(Icons.person),
+          backgroundColor: AppColors.primary,
+          child: Icon(
+            Icons.person,
+            color: Colors.white,
+          ),
         ),
       ],
     );
