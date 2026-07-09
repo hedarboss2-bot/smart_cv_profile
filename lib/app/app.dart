@@ -16,6 +16,7 @@ import 'package:smart_cv_profile/screens/smart_id/smart_id_screen.dart';
 import 'package:smart_cv_profile/screens/education/education_screen.dart';
 import 'package:smart_cv_profile/screens/experience/experience_screen.dart';
 import 'package:smart_cv_profile/screens/skills/skill_screen.dart';
+import 'package:smart_cv_profile/screens/pdf/cv_preview_screen.dart';
 
 class SmartCVApp extends StatelessWidget {
   const SmartCVApp({super.key});
@@ -50,6 +51,7 @@ class SmartCVApp extends StatelessWidget {
           AppRoutes.education: (_) => const EducationScreen(),
           AppRoutes.experience: (_) => const ExperienceScreen(),
           AppRoutes.skills: (_) => const SkillScreen(),
+          AppRoutes.cvPreview: (_) => const CvPreviewScreen(),
         },
       ),
     );

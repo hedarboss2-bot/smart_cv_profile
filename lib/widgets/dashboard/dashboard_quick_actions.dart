@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:smart_cv_profile/app/routes.dart';
+import 'package:smart_cv_profile/controllers/education_controller.dart';
+import 'package:smart_cv_profile/controllers/experience_controller.dart';
+import 'package:smart_cv_profile/controllers/profile_controller.dart';
+import 'package:smart_cv_profile/controllers/skill_controller.dart';
 import 'package:smart_cv_profile/core/design/app_colors.dart';
+import 'package:smart_cv_profile/core/pdf/cv_pdf_builder.dart';
+import 'package:smart_cv_profile/core/pdf/cv_pdf_exporter.dart';
+import 'package:smart_cv_profile/core/pdf/cv_pdf_generator.dart';
 
 class DashboardQuickActions extends StatelessWidget {
   const DashboardQuickActions({super.key});
 
-  void _comingSoon(BuildContext context, String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("$title Coming Soon"),
-      ),
+  Future<void> _exportPdf(BuildContext context) async {
+    final profileController = context.read<ProfileController>();
+    final educationController = context.read<EducationController>();
+    final experienceController = context.read<ExperienceController>();
+    final skillController = context.read<SkillController>();
+
+    final cv = CvPdfBuilder.build(
+      profile: profileController.user,
+      educations: educationController.educations,
+      experiences: experienceController.experiences,
+      skills: skillController.skills,
+    );
+
+    final bytes = await CvPdfGenerator.generate(cv);
+
+    await CvPdfExporter.preview(
+      (_) async => bytes,
     );
   }
 
@@ -57,7 +77,7 @@ class DashboardQuickActions extends StatelessWidget {
               icon: Icons.description,
               color: Colors.orange,
               onTap: () {
-                _comingSoon(context, "Preview CV");
+                Navigator.pushNamed(context, AppRoutes.cvPreview);
               },
             ),
             _ActionButton(
@@ -65,7 +85,7 @@ class DashboardQuickActions extends StatelessWidget {
               icon: Icons.picture_as_pdf,
               color: Colors.red,
               onTap: () {
-                _comingSoon(context, "Export PDF");
+                _exportPdf(context);
               },
             ),
           ],
@@ -101,7 +121,7 @@ class _ActionButton extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: color.withOpacity(.15),
+                backgroundColor: color.withValues(alpha: 0.15),
                 child: Icon(
                   icon,
                   color: color,
