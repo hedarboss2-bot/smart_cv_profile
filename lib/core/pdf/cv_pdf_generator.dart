@@ -18,30 +18,33 @@ class CvPdfGenerator {
       pw.MultiPage(
         margin: const pw.EdgeInsets.all(CvPdfTheme.pageMargin),
         build: (context) => [
-          pw.Text(
-            user.fullName.isEmpty ? "Your Name" : user.fullName,
-            style: CvPdfStyles.title(),
-          ),
-          pw.SizedBox(height: 6),
-          pw.Text(
-            user.jobTitle.isEmpty ? "Professional Title" : user.jobTitle,
-            style: CvPdfStyles.subtitle(),
-          ),
-          pw.SizedBox(height: 10),
-          pw.Text(user.email.isEmpty ? "email@example.com" : user.email),
-          pw.Text(user.phone.isEmpty ? "+000 000 0000" : user.phone),
-          pw.Text(
-            user.city.isEmpty && user.country.isEmpty
+          // =========================
+          // Header
+          // =========================
+
+          CvPdfSections.header(
+            fullName: user.fullName,
+            jobTitle: user.jobTitle,
+            email: user.email,
+            phone: user.phone,
+            address: user.city.isEmpty && user.country.isEmpty
                 ? "Your Address"
                 : "${user.city}, ${user.country}",
           ),
 
           pw.SizedBox(height: CvPdfTheme.sectionSpacing),
-          CvPdfSections.divider(),
+
+          // =========================
+          // Education
+          // =========================
 
           CvPdfSections.heading("Education"),
+
           if (cv.educations.isEmpty)
-            pw.Text("No education added yet.", style: CvPdfStyles.body())
+            pw.Text(
+              "No education added yet.",
+              style: CvPdfStyles.body(),
+            )
           else
             ...cv.educations.map(
               (e) => _item(
@@ -57,9 +60,17 @@ class CvPdfGenerator {
           pw.SizedBox(height: CvPdfTheme.sectionSpacing),
           CvPdfSections.divider(),
 
+          // =========================
+          // Experience
+          // =========================
+
           CvPdfSections.heading("Experience"),
+
           if (cv.experiences.isEmpty)
-            pw.Text("No experience added yet.", style: CvPdfStyles.body())
+            pw.Text(
+              "No experience added yet.",
+              style: CvPdfStyles.body(),
+            )
           else
             ...cv.experiences.map(
               (e) => _item(
@@ -75,32 +86,46 @@ class CvPdfGenerator {
           pw.SizedBox(height: CvPdfTheme.sectionSpacing),
           CvPdfSections.divider(),
 
+          // =========================
+          // Skills
+          // =========================
+
           CvPdfSections.heading("Skills"),
+
           if (cv.skills.isEmpty)
-            pw.Text("No skills added yet.", style: CvPdfStyles.body())
+            pw.Text(
+              "No skills added yet.",
+              style: CvPdfStyles.body(),
+            )
           else
             pw.Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: cv.skills
-                  .map(
-                    (s) => pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border.all(),
-                        borderRadius: pw.BorderRadius.circular(8),
-                      ),
-                      child: pw.Text(
-                        "${s.name} ${s.level}%",
-                        style: CvPdfStyles.body(),
-                      ),
-                    ),
-                  )
-                  .toList(),
+              children: cv.skills.map((skill) {
+                return pw.Container(
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: pw.BoxDecoration(
+                    border: pw.Border.all(),
+                    borderRadius: pw.BorderRadius.circular(8),
+                  ),
+                  child: pw.Text(
+                    "${skill.name} ${skill.level}%",
+                    style: CvPdfStyles.body(),
+                  ),
+                );
+              }).toList(),
             ),
+
+          pw.SizedBox(height: CvPdfTheme.sectionSpacing),
+
+          // =========================
+          // Footer
+          // =========================
+
+          CvPdfSections.footer(),
         ],
       ),
     );
@@ -115,7 +140,9 @@ class CvPdfGenerator {
     required String description,
   }) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.only(bottom: CvPdfTheme.itemSpacing),
+      padding: const pw.EdgeInsets.only(
+        bottom: CvPdfTheme.itemSpacing,
+      ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -123,13 +150,22 @@ class CvPdfGenerator {
             title.isEmpty ? "Untitled" : title,
             style: CvPdfStyles.heading(),
           ),
-          pw.SizedBox(height: 3),
-          pw.Text(subtitle, style: CvPdfStyles.subtitle()),
-          pw.SizedBox(height: 3),
-          pw.Text(date, style: CvPdfStyles.body()),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            subtitle,
+            style: CvPdfStyles.subtitle(),
+          ),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            date,
+            style: CvPdfStyles.body(),
+          ),
           if (description.isNotEmpty) ...[
             pw.SizedBox(height: 4),
-            pw.Text(description, style: CvPdfStyles.body()),
+            pw.Text(
+              description,
+              style: CvPdfStyles.body(),
+            ),
           ],
         ],
       ),
